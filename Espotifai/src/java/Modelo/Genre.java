@@ -10,5 +10,5 @@ package Modelo;
  * @author Cristian
  */
 public enum Genre {
-    
+    Rock, Techno, Pop, Jazz, Folk, Classical
 }

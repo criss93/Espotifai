@@ -10,11 +10,11 @@ package Modelo;
  * @author Cristian
  */
 public class Song {
-    public int Id;
+    public int id;
     public String name;
     public String author;
+    public Genre genre;
     
-    public enum Genre{
-        
+    public Song(){
     }
 }

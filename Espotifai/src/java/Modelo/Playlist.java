@@ -5,10 +5,15 @@
  */
 package Modelo;
 
+import java.util.List;
+
 /**
  *
  * @author Cristian
  */
 public class Playlist {
-    
+    public int id;
+    public String name;
+    public User user;
+    public List<Song> songs;
 }
