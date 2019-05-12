@@ -5,15 +5,60 @@
  */
 package Modelo;
 
+
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  *
  * @author Cristian
  */
-public class Playlist {
-    public int id;
+@Entity
+@Table (name="playlists")
+public class Playlist extends AbstractEntity{
+    
+
+    @Column (name = "name")
     public String name;
+    @ManyToOne
+    @JoinColumn (name="id_user", referencedColumnName="id")
     public User user;
+    @ManyToMany
+    @JoinColumn (name="id_song", referencedColumnName="id")
     public List<Song> songs;
+
+    public Playlist() {
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(List<Song> songs) {
+        this.songs = songs;
+    }
+    
 }
