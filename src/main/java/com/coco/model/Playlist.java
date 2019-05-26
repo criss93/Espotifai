@@ -14,6 +14,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
@@ -30,7 +32,7 @@ public class Playlist extends AbstractEntity{
     public String name;
     @ManyToOne
     @JoinColumn (name="id_user", referencedColumnName="id")
-    @JsonIgnore
+//    @JsonIgnore
     public User user;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn (name="id_song", referencedColumnName="id")

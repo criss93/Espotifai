@@ -124,5 +124,4 @@ public class PlaylistDao extends AbstractDao implements Serializable  {
             em.close();
         }
     }
-    
 }

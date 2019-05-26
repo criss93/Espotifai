@@ -27,6 +27,5 @@ public class LoginController {
         } else {
             return JWTService.getJWTTokenForUser(users.get(0));
         }
-    }
-    
+    }    
 }

@@ -40,8 +40,5 @@ public class LoginWebService {
             LoginFailedResponseBody responseBody = new LoginFailedResponseBody(ex.getMessage());
             return Response.status(403).entity(responseBody).build();
         }
-        
-        
-        
     }
 }
