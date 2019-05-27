@@ -9,13 +9,13 @@ package Models.Responses;
  *
  * @author Cristian
  */
-public class LoginFailedResponseBody {
+public class UpdatePlaylistNameFailedResponseBody {
     private String message;
 
-    public LoginFailedResponseBody() {
+    public UpdatePlaylistNameFailedResponseBody() {
     }
 
-    public LoginFailedResponseBody(String message) {
+    public UpdatePlaylistNameFailedResponseBody(String message) {
         this.message = message;
     }
 
@@ -25,5 +25,5 @@ public class LoginFailedResponseBody {
 
     public void setMessage(String message) {
         this.message = message;
-    }   
+    }
 }
