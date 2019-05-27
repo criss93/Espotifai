@@ -9,7 +9,8 @@ import Daos.PlaylistDao;
 import Daos.SongDao;
 import Models.Playlist;
 import Models.Song;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -71,5 +72,35 @@ public class PlaylistsController {
         catch(Exception ex){
             throw ex;
         }     
+    }
+    
+    public void updatePlaylistName(int playlistId, String playlistName) throws Exception{
+        PlaylistDao playlistDao = new PlaylistDao();
+        Playlist playlist = playlistDao.findPlaylist((long)playlistId);
+        playlist.name = playlistName;
+        try{
+            playlistDao.edit(playlist);
+        }
+        catch(Exception ex){
+            throw ex;
+        }     
+    }
+    
+    public Playlist getPlaylistInfo(int playlistId) throws Exception{
+        PlaylistDao playlistDao = new PlaylistDao();
+        try{
+            Playlist playlist = playlistDao.findPlaylist((long)playlistId);
+            return playlist;
+        }
+        catch(Exception ex){
+            throw ex;
+        }     
+    }
+    
+    public List<String> getPlaylists(){
+        PlaylistDao playlistDao = new PlaylistDao();
+        List<Playlist> playlists = playlistDao.findPlaylistEntities();
+        List<String> playlistsNames = playlists.stream().map(p -> p.getName()).collect(Collectors.toList());
+        return playlistsNames;
     }
 }
