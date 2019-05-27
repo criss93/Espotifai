@@ -11,13 +11,18 @@ import Daos.PlaylistDao;
 import Espotifai.JWTService;
 import Models.Playlist;
 import Models.Requests.AddSongRequestBody;
+import Models.Requests.UpdatePlaylistNameRequestBody;
 import Models.Responses.AddSongFailedResponseBody;
 import Models.Responses.AddSongSuccessResponseBody;
 import Models.Responses.DeletePlaylistFailedResponseBody;
 import Models.Responses.DeletePlaylistSuccessResponseBody;
 import Models.Responses.DeleteSongFailedResponseBody;
 import Models.Responses.DeleteSongSuccessResponseBody;
+import Models.Responses.GetPlaylistInfoFailedResponseBody;
+import Models.Responses.GetPlaylistsResponseBody;
 import Models.Responses.UnauthorizedResponseBody;
+import Models.Responses.UpdatePlaylistNameFailedResponseBody;
+import Models.Responses.UpdatePlaylistNameSuccessResponseBody;
 import io.jsonwebtoken.JwtException;
 import static java.lang.Integer.parseInt;
 import java.util.List;
@@ -26,6 +31,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -41,16 +47,28 @@ public class PlaylistWebService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPlaylists(@HeaderParam("Authorization") String authorization) {
-        
+    public Response getPlaylists() {
+        PlaylistsController playlistsController = new PlaylistsController();
         try {
-            JWTService.decodeJWTToken(authorization);
-            PlaylistDao dao = new PlaylistDao();
-            List<Playlist> playlists = dao.findPlaylistEntities();
-            return Response.ok(playlists).build();
-        } catch (JwtException ex) {
-            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
-            return Response.status(401).entity(responseBody).build();
+            List<String> playlists = playlistsController.getPlaylists();            
+            return Response.ok(new GetPlaylistsResponseBody(playlists)).build();
+        } catch (Exception ex) {
+            return Response.status(500).entity(new GetPlaylistInfoFailedResponseBody(ex.getMessage())).build();
+        }
+    }
+    
+    @GET
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPlaylistInfo(@PathParam("id") int playlistId) {
+        PlaylistsController playlistsController = new PlaylistsController();
+        try {
+            if(!playlistsController.playlistExists(playlistId))
+                return Response.status(404).entity(new GetPlaylistInfoFailedResponseBody("Playlist not found.")).build();
+            Playlist playlist = playlistsController.getPlaylistInfo(playlistId);
+            return Response.ok(playlist).build();
+        } catch (Exception ex) {
+            return Response.status(500).entity(new GetPlaylistInfoFailedResponseBody(ex.getMessage())).build();
         }
     }
     
@@ -122,6 +140,27 @@ public class PlaylistWebService {
             return Response.status(401).entity(responseBody).build();
         } catch (Exception ex){
             return Response.status(500).entity(new DeletePlaylistFailedResponseBody(ex.getMessage())).build();
+        }
+    }
+    
+    @PUT
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updatePlaylistName(@HeaderParam("Authorization") String authorization, @PathParam("id") int playlistId, UpdatePlaylistNameRequestBody request) {
+        PlaylistsController playlistsController = new PlaylistsController();
+        try {
+            int user_id = parseInt(JWTService.decodeJWTToken(authorization));
+            if(!playlistsController.playlistExists(playlistId))
+                return Response.status(404).entity(new UpdatePlaylistNameFailedResponseBody("Playlist not found.")).build();
+            if(!playlistsController.userOwnsThePlaylist(user_id, playlistId))
+                return Response.status(401).entity(new UpdatePlaylistNameFailedResponseBody("The user doesn't have permission to edit the playlist.")).build();
+            playlistsController.updatePlaylistName(playlistId, request.getName());
+            return Response.ok( new UpdatePlaylistNameSuccessResponseBody()).build();
+        } catch (JwtException ex) {
+            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
+            return Response.status(401).entity(responseBody).build();
+        } catch (Exception ex){
+            return Response.status(500).entity(new UpdatePlaylistNameFailedResponseBody(ex.getMessage())).build();
         }
     }
 }
