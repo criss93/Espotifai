@@ -111,6 +111,40 @@ public class SongDao extends AbstractDao implements Serializable {
             em.close();
         }
     }
+    
+    public List<Song> getSongsFilteredByAuthor(String author) {
+        EntityManager em = getEntityManager();
+        try {
+            Query q = em.createNamedQuery("Song.findSongsByAuthor");
+            q.setParameter("author", author);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public List<Song> getSongsFilteredByGenre(String genre) {
+        EntityManager em = getEntityManager();
+        try {
+            Query q = em.createNamedQuery("Song.findSongsByGenre");
+            q.setParameter("genre", genre);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public List<Song> getSongsFilteredByAuthorAndGenre(String author, String genre) {
+        EntityManager em = getEntityManager();
+        try {
+            Query q = em.createNamedQuery("Song.findSongsByAuthorAndGenre");
+            q.setParameter("author", author);
+            q.setParameter("genre", genre);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
     public int getSongCount() {
         EntityManager em = getEntityManager();

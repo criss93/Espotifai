@@ -10,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -18,6 +20,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table (name="songs")
+@NamedQueries({
+    @NamedQuery(name = "Song.findSongsByAuthor", query="SELECT s FROM Song s WHERE s.author = :author"),
+    @NamedQuery(name = "Song.findSongsByGenre", query="SELECT s FROM Song s WHERE s.genre = :genre"),
+    @NamedQuery(name = "Song.findSongsByAuthorAndGenre", query="SELECT s FROM Song s WHERE s.author = :author AND s.genre = :genre"),
+})
 public class Song extends AbstractEntity  {
   
     @Column (name = "name")
