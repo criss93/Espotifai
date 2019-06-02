@@ -34,6 +34,7 @@ public class Song extends AbstractEntity  {
     @Enumerated(EnumType.STRING)
     public Genre genre;
     
+    
     public Song(){
     }
 

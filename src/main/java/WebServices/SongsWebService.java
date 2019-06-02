@@ -6,6 +6,7 @@
 package WebServices;
 
 import Controllers.SongsController;
+import Models.Genre;
 import Models.Responses.GetPlaylistInfoFailedResponseBody;
 import Models.Responses.GetPlaylistsResponseBody;
 import Models.Responses.GetSongsFailedResponseBody;
@@ -27,7 +28,8 @@ import javax.ws.rs.core.Response;
 public class SongsWebService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSongs(@QueryParam("author")String author, @QueryParam("genre")String genre) {
+    //cambio tipo de genre
+    public Response getSongs(@QueryParam("author")String author, @QueryParam("genre") Genre genre) {
         SongsController songsController = new SongsController();
         try {
             if(author != null){
@@ -42,7 +44,7 @@ public class SongsWebService {
             } else 
             {
                 if(genre != null){
-                    List<Song> songs = songsController.getSongsFilteredByGenre(genre);            
+                    List<Song> songs = songsController.getSongsFilteredByGenre(genre);
                     return Response.ok(new GetSongsResponseBody(songs)).build();
                 }
             }

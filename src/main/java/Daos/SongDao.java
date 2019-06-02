@@ -5,6 +5,7 @@
  */
 package Daos;
 
+import Models.Genre;
 import Models.Song;
 import java.io.Serializable;
 import java.util.List;
@@ -123,7 +124,8 @@ public class SongDao extends AbstractDao implements Serializable {
         }
     }
     
-    public List<Song> getSongsFilteredByGenre(String genre) {
+    //tambien acá
+    public List<Song> getSongsFilteredByGenre(Genre genre) {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Song.findSongsByGenre");
@@ -133,8 +135,8 @@ public class SongDao extends AbstractDao implements Serializable {
             em.close();
         }
     }
-    
-    public List<Song> getSongsFilteredByAuthorAndGenre(String author, String genre) {
+    //Y acá
+    public List<Song> getSongsFilteredByAuthorAndGenre(String author, Genre genre) {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Song.findSongsByAuthorAndGenre");
