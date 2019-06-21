@@ -11,9 +11,12 @@ import Daos.PlaylistDao;
 import Espotifai.JWTService;
 import Models.Playlist;
 import Models.Requests.AddSongRequestBody;
+import Models.Requests.CreatePlaylistRequestBody;
 import Models.Requests.UpdatePlaylistNameRequestBody;
 import Models.Responses.AddSongFailedResponseBody;
 import Models.Responses.AddSongSuccessResponseBody;
+import Models.Responses.CreatePlaylistFailedResponseBody;
+import Models.Responses.CreatePlaylistSuccessResponseBody;
 import Models.Responses.DeletePlaylistFailedResponseBody;
 import Models.Responses.DeletePlaylistSuccessResponseBody;
 import Models.Responses.DeleteSongFailedResponseBody;
@@ -54,6 +57,26 @@ public class PlaylistWebService {
             return Response.ok(new GetPlaylistsResponseBody(playlists)).build();
         } catch (Exception ex) {
             return Response.status(500).entity(new GetPlaylistInfoFailedResponseBody(ex.getMessage())).build();
+        }
+    }
+    
+    @POST
+    //No tiene el path porque ya tenemos el path base en la clase
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createPlaylist(@HeaderParam("Authorization") String authorization, CreatePlaylistRequestBody request) {
+        PlaylistsController playlistsController = new PlaylistsController();
+        try {
+            int user_id = parseInt(JWTService.decodeJWTToken(authorization));            
+            if(playlistsController.thePlaylistExists(request.getName(), user_id))
+                return Response.status(400).entity(new CreatePlaylistFailedResponseBody("The playlist already exists.")).build();
+            playlistsController.createPlaylist(request.getName(), user_id);
+            return Response.ok(new CreatePlaylistSuccessResponseBody()).build();
+        } catch (JwtException ex) {
+            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
+            return Response.status(401).entity(responseBody).build();
+        } catch (Exception ex){
+            return Response.status(500).entity(new CreatePlaylistFailedResponseBody(ex.getMessage())).build();
         }
     }
     
@@ -162,5 +185,5 @@ public class PlaylistWebService {
         } catch (Exception ex){
             return Response.status(500).entity(new UpdatePlaylistNameFailedResponseBody(ex.getMessage())).build();
         }
-    }
+    }    
 }

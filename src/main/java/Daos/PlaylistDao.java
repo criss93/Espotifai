@@ -111,6 +111,18 @@ public class PlaylistDao extends AbstractDao implements Serializable  {
             em.close();
         }
     }
+    
+     public List<Playlist> findPlaylist(String name, Long user_id) {
+        EntityManager em = getEntityManager();
+        try {
+            Query q = em.createNamedQuery("Playlist.findByNameAndUser");
+            q.setParameter("name", name);
+            q.setParameter("id_user", user_id);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
     public int getPlaylistCount() {
         EntityManager em = getEntityManager();

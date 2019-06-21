@@ -103,7 +103,7 @@ public class UserDao extends AbstractDao implements Serializable {
         }
     }
     
-        public List<User> findUserByEmailAndPass(String email, String password) {
+    public List<User> findUserByEmailAndPass(String email, String password) {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("User.findByEmail");
