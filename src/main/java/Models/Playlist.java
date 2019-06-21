@@ -25,6 +25,9 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  */
 @Entity
 @Table (name="playlists")
+@NamedQueries({
+    @NamedQuery(name = "Playlist.findByNameAndUser", query="SELECT p FROM Playlist p WHERE p.name = :name AND p.user.id = :id_user"),
+})
 public class Playlist extends AbstractEntity{
     
 
@@ -41,6 +44,12 @@ public class Playlist extends AbstractEntity{
     public Playlist() {
     }
 
+    public Playlist(String name, User user) {
+        this.name = name;
+        this.user = user;
+    }
+
+    
 
     public String getName() {
         return name;

@@ -7,8 +7,10 @@ package Controllers;
 
 import Daos.PlaylistDao;
 import Daos.SongDao;
+import Daos.UserDao;
 import Models.Playlist;
 import Models.Song;
+import Models.User;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -102,5 +104,24 @@ public class PlaylistsController {
         List<Playlist> playlists = playlistDao.findPlaylistEntities();
         List<String> playlistsNames = playlists.stream().map(p -> p.getName()).collect(Collectors.toList());
         return playlistsNames;
+    }
+    
+    public void createPlaylist(String namePlaylist, int userId) throws Exception{
+        PlaylistDao playlistDao = new PlaylistDao();
+        UserDao userDao = new UserDao();
+        User userObj = userDao.findUser((long) userId);
+        Playlist playlist = new Playlist(namePlaylist, userObj);        
+        try{
+            playlistDao.create(playlist);
+        }
+        catch(Exception ex){
+            throw ex;
+        }     
+    }
+    
+    public boolean thePlaylistExists(String name, int user_id){
+        PlaylistDao playlistDao = new PlaylistDao();
+        List<Playlist> playlists = playlistDao.findPlaylist(name, (long)user_id);
+        return !playlists.isEmpty();
     }
 }

@@ -8,6 +8,7 @@ package Espotifai;
 import WebServices.HealthcheckWebService;
 import WebServices.LoginWebService;
 import WebServices.PlaylistWebService;
+import WebServices.SongsWebService;
 import java.util.ArrayList;
 import java.util.List;
 import org.jboss.resteasy.plugins.server.netty.NettyJaxrsServer;
@@ -26,6 +27,7 @@ public class NettyService {
             classes.add(HealthcheckWebService.class.getName());
             classes.add(LoginWebService.class.getName());
             classes.add(PlaylistWebService.class.getName());
+            classes.add(SongsWebService.class.getName());
 
             deployment.setResourceClasses(classes);
 
