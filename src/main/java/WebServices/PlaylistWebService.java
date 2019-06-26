@@ -7,7 +7,6 @@ package WebServices;
 
 import Controllers.PlaylistsController;
 import Controllers.SongsController;
-import Daos.PlaylistDao;
 import Espotifai.JWTService;
 import Models.Playlist;
 import Models.Requests.AddSongRequestBody;
@@ -28,7 +27,7 @@ import Models.Responses.UpdatePlaylistNameFailedResponseBody;
 import Models.Responses.UpdatePlaylistNameSuccessResponseBody;
 import io.jsonwebtoken.JwtException;
 import static java.lang.Integer.parseInt;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -38,6 +37,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -50,14 +51,15 @@ public class PlaylistWebService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPlaylists() {
-        PlaylistsController playlistsController = new PlaylistsController();
-        try {
-            List<String> playlists = playlistsController.getPlaylists();            
-            return Response.ok(new GetPlaylistsResponseBody(playlists)).build();
-        } catch (Exception ex) {
-            return Response.status(500).entity(new GetPlaylistInfoFailedResponseBody(ex.getMessage())).build();
-        }
+    public void getPlaylists(@Suspended final AsyncResponse asyncResponse) throws InterruptedException {
+        CompletableFuture.supplyAsync(() -> {
+            PlaylistsController playlistsController = new PlaylistsController();
+            return playlistsController.getPlaylists();
+        }).thenAcceptAsync(playlists -> {
+            GetPlaylistsResponseBody responseBody = new GetPlaylistsResponseBody(playlists);
+            Response response = Response.ok(responseBody).build();
+            asyncResponse.resume(response);}
+        ).join();
     }
     
     @POST

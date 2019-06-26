@@ -7,16 +7,14 @@ package WebServices;
 
 import Controllers.SongsController;
 import Models.Genre;
-import Models.Responses.GetPlaylistInfoFailedResponseBody;
-import Models.Responses.GetPlaylistsResponseBody;
-import Models.Responses.GetSongsFailedResponseBody;
 import Models.Responses.GetSongsResponseBody;
-import Models.Song;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -26,32 +24,24 @@ import javax.ws.rs.core.Response;
  */
 @Path("/mymusic/songs")
 public class SongsWebService {
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     //cambio tipo de genre
-    public Response getSongs(@QueryParam("author")String author, @QueryParam("genre") Genre genre) {
-        SongsController songsController = new SongsController();
-        try {
-            if(author != null){
-                if(genre != null){
-                    List<Song> songs = songsController.getSongsFilteredByAuthorAndGenre(author, genre);            
-                    return Response.ok(new GetSongsResponseBody(songs)).build();
-                } else 
-                {
-                    List<Song> songs = songsController.getSongsFilteredByAuthor(author);            
-                    return Response.ok(new GetSongsResponseBody(songs)).build();
-                }                
-            } else 
-            {
-                if(genre != null){
-                    List<Song> songs = songsController.getSongsFilteredByGenre(genre);
-                    return Response.ok(new GetSongsResponseBody(songs)).build();
+    public void getSongs(@Suspended final AsyncResponse asyncResponse, @QueryParam("author") String author, @QueryParam("genre") Genre genre) throws InterruptedException {
+        CompletableFuture.supplyAsync(() -> {
+            SongsController songsController = new SongsController();
+            if (author != null) {
+                if (genre != null) {
+                    return songsController.getSongsFilteredByAuthorAndGenre(author, genre);
+                } else {
+                    return songsController.getSongsFilteredByAuthor(author);
                 }
+            } else if (genre != null) {
+                return songsController.getSongsFilteredByGenre(genre);
             }
-            List<Song> songs = songsController.getSongs();            
-            return Response.ok(new GetSongsResponseBody(songs)).build();
-        } catch (Exception ex) {
-            return Response.status(500).entity(new GetSongsFailedResponseBody(ex.getMessage())).build();
-        }
+            return songsController.getSongs();
+        }).thenAcceptAsync(songs -> 
+            asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build())).join();
     }
 }
