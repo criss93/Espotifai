@@ -56,9 +56,7 @@ public class PlaylistWebService {
             PlaylistsController playlistsController = new PlaylistsController();
             return playlistsController.getPlaylists();
         }).thenAcceptAsync(playlists -> {
-            GetPlaylistsResponseBody responseBody = new GetPlaylistsResponseBody(playlists);
-            Response response = Response.ok(responseBody).build();
-            asyncResponse.resume(response);}
+            asyncResponse.resume(Response.ok(new GetPlaylistsResponseBody(playlists)).build());}
         ).join();
     }
     
