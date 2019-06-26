@@ -31,28 +31,31 @@ import javax.ws.rs.core.Response;
 public class SongsWebService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    //cambio tipo de genre
+    
+    
     public void getSongs(@Suspended final AsyncResponse asyncResponse, @QueryParam("author")String author, @QueryParam("genre") Genre genre) {
         SongsController songsController = new SongsController();
         try {
-            if(author != null){
-                if(genre != null){
-                    List<Song> songs = songsController.getSongsFilteredByAuthorAndGenre(author, genre);            
-                    asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build());
+            
+            CompletableFuture.supplyAsync(() -> {
+                if(author != null){
+                    if(genre != null){
+                        return songsController.getSongsFilteredByAuthorAndGenre(author, genre);            
                 } else 
                 {
-                    List<Song> songs = songsController.getSongsFilteredByAuthor(author);            
-                    asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build());
+                        return songsController.getSongsFilteredByAuthor(author);            
+
                 }                
             } else 
             {
-                if(genre != null){
-                    List<Song> songs = songsController.getSongsFilteredByGenre(genre);
-                    asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build());
-                }
+                    if(genre != null){
+                        return songsController.getSongsFilteredByGenre(genre);
+                }else{
+                        return songsController.getSongs();
+                    }
             }
-            CompletableFuture.supplyAsync(() -> {
-                return songsController.getSongs();  
+                
+                 
             }).thenAccept(songs -> {
                  asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build());
             });

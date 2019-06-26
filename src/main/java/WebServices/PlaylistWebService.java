@@ -22,13 +22,17 @@ import Models.Responses.DeletePlaylistSuccessResponseBody;
 import Models.Responses.DeleteSongFailedResponseBody;
 import Models.Responses.DeleteSongSuccessResponseBody;
 import Models.Responses.GetPlaylistInfoFailedResponseBody;
+import Models.Responses.GetPlaylistsFailedResponseBody;
 import Models.Responses.GetPlaylistsResponseBody;
+import Models.Responses.GetSongsFailedResponseBody;
+import Models.Responses.GetSongsResponseBody;
 import Models.Responses.UnauthorizedResponseBody;
 import Models.Responses.UpdatePlaylistNameFailedResponseBody;
 import Models.Responses.UpdatePlaylistNameSuccessResponseBody;
 import io.jsonwebtoken.JwtException;
 import static java.lang.Integer.parseInt;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -38,25 +42,34 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
  *
- * @author Cristian
+ * @author s_fer
  */
 @Path("/mymusic/playlists")
 public class PlaylistWebService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPlaylists() {
+    
+    //Acá se comporta de la misma manera que en getSongs ¯\_(ツ)_/¯
+    public void getPlaylists(@Suspended final AsyncResponse asyncResponse) {
+       
         PlaylistsController playlistsController = new PlaylistsController();
         try {
-            List<String> playlists = playlistsController.getPlaylists();            
-            return Response.ok(new GetPlaylistsResponseBody(playlists)).build();
+            CompletableFuture.supplyAsync(() -> {
+                return playlistsController.getPlaylists();            
+                
+            }).thenAccept(playlist -> {
+                 asyncResponse.resume(Response.ok(new GetPlaylistsResponseBody(playlist)).build());
+            });
         } catch (Exception ex) {
-            return Response.status(500).entity(new GetPlaylistInfoFailedResponseBody(ex.getMessage())).build();
+            asyncResponse.resume(Response.status(500).entity(new GetPlaylistsFailedResponseBody(ex.getMessage())).build());
         }
     }
     
