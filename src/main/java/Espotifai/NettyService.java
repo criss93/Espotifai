@@ -37,6 +37,7 @@ public class NettyService {
 
             server.setPort(port);
             server.start();
+            server.getDeployment().getProviderFactory().register(CORSFilter.class);
             System.out.println("Web Server listening on port: " + port);
             System.out.println("Attached web services are: ");
             classes.forEach(x -> System.out.println("- " + x));
