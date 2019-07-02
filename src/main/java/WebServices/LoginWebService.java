@@ -35,7 +35,11 @@ public class LoginWebService {
         try {
             token = controller.login(loginRequest.getEmail(), loginRequest.getPassword());
             LoginResponseBody responseBody = new LoginResponseBody(token);
-            return Response.ok(responseBody).build();
+            return Response.ok(responseBody)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "content-type, authorization")
+                    .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                    .build();
         } catch (ValidationException ex) {
             LoginFailedResponseBody responseBody = new LoginFailedResponseBody(ex.getMessage());
             return Response.status(403).entity(responseBody).build();

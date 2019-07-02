@@ -41,7 +41,7 @@ public class SongsWebService {
                 return songsController.getSongsFilteredByGenre(genre);
             }
             return songsController.getSongs();
-        }).thenAcceptAsync(songs -> 
+        }).thenAccept(songs -> 
             asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build())).join();
     }
 }

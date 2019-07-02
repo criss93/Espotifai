@@ -55,7 +55,7 @@ public class PlaylistWebService {
         CompletableFuture.supplyAsync(() -> {
             PlaylistsController playlistsController = new PlaylistsController();
             return playlistsController.getPlaylists();
-        }).thenAcceptAsync(playlists -> {
+        }).thenAccept(playlists -> {
             asyncResponse.resume(Response.ok(new GetPlaylistsResponseBody(playlists)).build());}
         ).join();
     }
