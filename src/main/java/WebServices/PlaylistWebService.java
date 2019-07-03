@@ -51,13 +51,19 @@ public class PlaylistWebService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public void getPlaylists(@Suspended final AsyncResponse asyncResponse) throws InterruptedException {
-        CompletableFuture.supplyAsync(() -> {
+    public void getPlaylists(@Suspended final AsyncResponse asyncResponse, @HeaderParam("Authorization") String authorization) throws InterruptedException {
+        try {
+            int user_id = parseInt(JWTService.decodeJWTToken(authorization)); 
+            CompletableFuture.supplyAsync(() -> {
             PlaylistsController playlistsController = new PlaylistsController();
             return playlistsController.getPlaylists();
-        }).thenAccept(playlists -> {
+            }).thenAccept(playlists -> {
             asyncResponse.resume(Response.ok(new GetPlaylistsResponseBody(playlists)).build());}
-        ).join();
+            ).join();
+        } catch (JwtException ex) {
+            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
+            asyncResponse.resume(Response.status(401).entity(responseBody).build());
+        } 
     }
     
     @POST
