@@ -27,6 +27,9 @@ public class CORSFilter implements ContainerResponseFilter{
                 "content-type, authorization");
         responseContext.getHeaders().add("Access-Control-Allow-Methods",
                 "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+        if(responseContext.getStatus() == 204){
+            responseContext.setStatus(200);
+        }
     }
     
 }
