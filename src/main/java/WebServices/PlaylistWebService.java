@@ -7,7 +7,6 @@ package WebServices;
 
 import Controllers.PlaylistsController;
 import Controllers.SongsController;
-import Daos.PlaylistDao;
 import Espotifai.JWTService;
 import Models.Playlist;
 import Models.Requests.AddSongRequestBody;
@@ -31,7 +30,6 @@ import Models.Responses.UpdatePlaylistNameFailedResponseBody;
 import Models.Responses.UpdatePlaylistNameSuccessResponseBody;
 import io.jsonwebtoken.JwtException;
 import static java.lang.Integer.parseInt;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -56,21 +54,15 @@ public class PlaylistWebService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    
-    //Acá se comporta de la misma manera que en getSongs ¯\_(ツ)_/¯
-    public void getPlaylists(@Suspended final AsyncResponse asyncResponse) {
-       
-        PlaylistsController playlistsController = new PlaylistsController();
-        try {
-            CompletableFuture.supplyAsync(() -> {
-                return playlistsController.getPlaylists();            
-                
-            }).thenAccept(playlist -> {
-                 asyncResponse.resume(Response.ok(new GetPlaylistsResponseBody(playlist)).build());
-            });
-        } catch (Exception ex) {
-            asyncResponse.resume(Response.status(500).entity(new GetPlaylistsFailedResponseBody(ex.getMessage())).build());
-        }
+
+    public void getPlaylists(@Suspended final AsyncResponse asyncResponse) throws InterruptedException {
+        CompletableFuture.supplyAsync(() -> {
+            PlaylistsController playlistsController = new PlaylistsController();
+            return playlistsController.getPlaylists();
+        }).thenAcceptAsync(playlists -> {
+            asyncResponse.resume(Response.ok(new GetPlaylistsResponseBody(playlists)).build());}
+        ).join();
+
     }
     
     @POST
