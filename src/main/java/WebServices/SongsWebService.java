@@ -24,10 +24,9 @@ import javax.ws.rs.core.Response;
  */
 @Path("/mymusic/songs")
 public class SongsWebService {
-
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    //cambio tipo de genre
     public void getSongs(@Suspended final AsyncResponse asyncResponse, @QueryParam("author") String author, @QueryParam("genre") Genre genre) throws InterruptedException {
         CompletableFuture.supplyAsync(() -> {
             SongsController songsController = new SongsController();
@@ -41,7 +40,7 @@ public class SongsWebService {
                 return songsController.getSongsFilteredByGenre(genre);
             }
             return songsController.getSongs();
-        }).thenAccept(songs -> 
+        }).thenApplyAsync(songs -> 
             asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build())).join();
     }
 }

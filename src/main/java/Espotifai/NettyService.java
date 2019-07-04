@@ -5,6 +5,8 @@
  */
 package Espotifai;
 
+import Filters.AuthorizationFilter;
+import Filters.CORSFilter;
 import WebServices.HealthcheckWebService;
 import WebServices.LoginWebService;
 import WebServices.PlaylistWebService;
@@ -34,9 +36,9 @@ public class NettyService {
             final NettyJaxrsServer server = new NettyJaxrsServer();
             server.setExecutorThreadCount(16);
             server.setDeployment(deployment);
-
             server.setPort(port);
             server.start();
+            server.getDeployment().getProviderFactory().register(AuthorizationFilter.class);
             server.getDeployment().getProviderFactory().register(CORSFilter.class);
             System.out.println("Web Server listening on port: " + port);
             System.out.println("Attached web services are: ");

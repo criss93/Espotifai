@@ -22,10 +22,8 @@ import Models.Responses.DeleteSongFailedResponseBody;
 import Models.Responses.DeleteSongSuccessResponseBody;
 import Models.Responses.GetPlaylistInfoFailedResponseBody;
 import Models.Responses.GetPlaylistsResponseBody;
-import Models.Responses.UnauthorizedResponseBody;
 import Models.Responses.UpdatePlaylistNameFailedResponseBody;
 import Models.Responses.UpdatePlaylistNameSuccessResponseBody;
-import io.jsonwebtoken.JwtException;
 import static java.lang.Integer.parseInt;
 import java.util.concurrent.CompletableFuture;
 import javax.ws.rs.Consumes;
@@ -51,19 +49,13 @@ public class PlaylistWebService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public void getPlaylists(@Suspended final AsyncResponse asyncResponse, @HeaderParam("Authorization") String authorization) throws InterruptedException {
-        try {
-            int user_id = parseInt(JWTService.decodeJWTToken(authorization)); 
-            CompletableFuture.supplyAsync(() -> {
-            PlaylistsController playlistsController = new PlaylistsController();
-            return playlistsController.getPlaylists();
-            }).thenAccept(playlists -> {
+    public void getPlaylists(@Suspended final AsyncResponse asyncResponse) throws InterruptedException {
+        CompletableFuture.supplyAsync(() -> {
+        PlaylistsController playlistsController = new PlaylistsController();
+        return playlistsController.getPlaylists();
+        }).thenAccept(playlists -> {
             asyncResponse.resume(Response.ok(new GetPlaylistsResponseBody(playlists)).build());}
-            ).join();
-        } catch (JwtException ex) {
-            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
-            asyncResponse.resume(Response.status(401).entity(responseBody).build());
-        } 
+        );
     }
     
     @POST
@@ -78,9 +70,6 @@ public class PlaylistWebService {
                 return Response.status(400).entity(new CreatePlaylistFailedResponseBody("The playlist already exists.")).build();
             playlistsController.createPlaylist(request.getName(), user_id);
             return Response.ok(new CreatePlaylistSuccessResponseBody()).build();
-        } catch (JwtException ex) {
-            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
-            return Response.status(401).entity(responseBody).build();
         } catch (Exception ex){
             return Response.status(500).entity(new CreatePlaylistFailedResponseBody(ex.getMessage())).build();
         }
@@ -120,9 +109,6 @@ public class PlaylistWebService {
                 return Response.status(400).entity(new AddSongFailedResponseBody("The song is already in the playlist.")).build();
             playlistsController.addSong(playlistId, request.getId());
             return Response.ok( new AddSongSuccessResponseBody()).build();
-        } catch (JwtException ex) {
-            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
-            return Response.status(401).entity(responseBody).build();
         } catch (Exception ex){
             return Response.status(500).entity(new AddSongFailedResponseBody(ex.getMessage())).build();
         }
@@ -143,9 +129,6 @@ public class PlaylistWebService {
                 return Response.status(400).entity(new DeleteSongFailedResponseBody("The song is not in the playlist.")).build();
             playlistsController.deleteSong(playlistId, songId);
             return Response.ok( new DeleteSongSuccessResponseBody()).build();
-        } catch (JwtException ex) {
-            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
-            return Response.status(401).entity(responseBody).build();
         } catch (Exception ex){
             return Response.status(500).entity(new DeleteSongFailedResponseBody(ex.getMessage())).build();
         }
@@ -164,9 +147,6 @@ public class PlaylistWebService {
                 return Response.status(401).entity(new DeletePlaylistFailedResponseBody("The user doesn't have permission to delete the playlist.")).build();
             playlistsController.deletePlaylist(playlistId);
             return Response.ok( new DeletePlaylistSuccessResponseBody()).build();
-        } catch (JwtException ex) {
-            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
-            return Response.status(401).entity(responseBody).build();
         } catch (Exception ex){
             return Response.status(500).entity(new DeletePlaylistFailedResponseBody(ex.getMessage())).build();
         }
@@ -185,9 +165,6 @@ public class PlaylistWebService {
                 return Response.status(401).entity(new UpdatePlaylistNameFailedResponseBody("The user doesn't have permission to edit the playlist.")).build();
             playlistsController.updatePlaylistName(playlistId, request.getName());
             return Response.ok( new UpdatePlaylistNameSuccessResponseBody()).build();
-        } catch (JwtException ex) {
-            UnauthorizedResponseBody responseBody = new UnauthorizedResponseBody(ex.getMessage());
-            return Response.status(401).entity(responseBody).build();
         } catch (Exception ex){
             return Response.status(500).entity(new UpdatePlaylistNameFailedResponseBody(ex.getMessage())).build();
         }
