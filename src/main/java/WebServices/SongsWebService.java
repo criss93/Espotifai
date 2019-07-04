@@ -41,6 +41,6 @@ public class SongsWebService {
             }
             return songsController.getSongs();
         }).thenApplyAsync(songs -> 
-            asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build())).join();
+            asyncResponse.resume(Response.ok(new GetSongsResponseBody(songs)).build()));
     }
 }
